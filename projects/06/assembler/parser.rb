@@ -25,8 +25,6 @@ class Parser
   end
 
   def command_type
-    puts @current_line
-
     return if comment_or_empty_line?
 
     if @current_line[0] == '@'

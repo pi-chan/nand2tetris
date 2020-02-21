@@ -20,14 +20,8 @@ loop do
   elsif parser.command_type == :L
     code.assemble_l_instruction(parser.symbol)
   elsif parser.command_type == :C
-    code.assemble_c_instruction(parser.dest, parser.comp, parser.jump)
+    code.assemble_c_instruction(parser.comp, parser.dest, parser.jump)
   end
 
   break unless parser.has_more_commands?
 end
-
-# File.open(out_file, 'w') do |f|
-#   File.foreach(in_file) do |line|
-#     f.puts line
-#   end
-# end

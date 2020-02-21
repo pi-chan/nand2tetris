@@ -10,8 +10,8 @@ class Code
   def assemble_l_instruction(symbol)
   end
 
-  def assemble_c_instruction(dest, comp, jump)
-    @file.puts "111#{dest}#{comp}#{jump}"
+  def assemble_c_instruction(comp, dest, jump)
+    @file.puts "111#{comp}#{dest}#{jump}"
   end
 
   def close
