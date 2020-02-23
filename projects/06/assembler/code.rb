@@ -7,9 +7,6 @@ class Code
     @file.puts "0%015b" % symbol
   end
 
-  def assemble_l_instruction(symbol)
-  end
-
   def assemble_c_instruction(comp, dest, jump)
     @file.puts "111#{comp}#{dest}#{jump}"
   end

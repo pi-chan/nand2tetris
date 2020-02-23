@@ -1,6 +1,8 @@
 class Parser
   class ParseError < StandardError; end
 
+  attr_reader :current_line
+
   def initialize(in_file)
     @in_file = in_file
     @file = File.open(in_file)
@@ -16,8 +18,12 @@ class Parser
     !@file.eof
   end
 
+  def reset
+    @file.rewind
+  end
+
   def advance
-    @current_line = @file.gets.strip
+    @current_line = @file.gets.strip.strip.gsub(%r{//.+}, '').strip
   end
 
   def comment_or_empty_line?
