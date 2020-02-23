@@ -49,24 +49,30 @@ class Parser
 
   def dest
     raise ParseError if command_type != :C
+    return '000' unless @current_line.include?('=')
 
-    # left_operand
-    lo = @current_line.split('=').first
-    %w(A D M).map {|d| lo.include?(d) ? 1 : 0 }.join('')
+    operand = @current_line.split('=').first
+    %w(A D M).map {|d| operand.include?(d) ? 1 : 0 }.join('')
   end
 
   def comp
     raise ParseError if command_type != :C
 
-    # right_operand
-    ro = @current_line.split('=').last
-    a, target = if ro.include? 'M'
-      ['1', 'M']
-    else
-      ['0', 'A']
-    end
+    operand = if @current_line.include?('=')
+                @current_line.split('=').last
+              elsif @current_line.include?(';')
+                @current_line.split(';').first
+              else
+                raise ParseError
+              end
 
-    base = case ro
+    a, target = if operand.include? 'M'
+                  ['1', 'M']
+                else
+                  ['0', 'A']
+                end
+
+    base = case operand
            when '0'
              '101010'
            when '1'
@@ -111,7 +117,27 @@ class Parser
 
   def jump
     raise ParseError if command_type != :C
+    return '000' unless @current_line.include?(';')
 
-    '000'
+    operand = @current_line.split(';').last
+
+    case operand
+    when 'JGT'
+      '001'
+    when 'JEQ'
+      '010'
+    when 'JGE'
+      '011'
+    when 'JLT'
+      '100'
+    when 'JNE'
+      '101'
+    when 'JLE'
+      '110'
+    when 'JMP'
+      '111'
+    else
+      '000'
+    end
   end
 end
