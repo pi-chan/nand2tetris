@@ -59,7 +59,7 @@ class Parser
 
   def arg2
     tokens = @current_line.split(/\s/)
-    tokens[2]
+    tokens[2].to_i
   end
 
   def command_type
