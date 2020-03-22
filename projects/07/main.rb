@@ -10,6 +10,8 @@ code_writer = CodeWriter.new(parser.out_file)
 loop do
   parser.advance
 
+  puts parser.current_line
+
   case parser.command_type
   when :C_ARITHMETIC
     code_writer.write_arithmetic(parser.arg1)
