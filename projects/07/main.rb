@@ -22,3 +22,5 @@ loop do
 
   break unless parser.has_more_commands?
 end
+
+code_writer.close
