@@ -10,6 +10,8 @@ code_writer = CodeWriter.new(parser.out_file)
 loop do
   parser.advance
 
+  code_writer.input_file_name = parser.current_file_name
+
   puts parser.current_line
 
   case parser.command_type

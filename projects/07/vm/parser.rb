@@ -33,6 +33,10 @@ class Parser
     File.join(dir, "#{file}.asm")
   end
 
+  def current_file_name
+    File.basename(@current_file, '.vm')
+  end
+
   def advance
     if @current_file.eof
       @current_file = next_file

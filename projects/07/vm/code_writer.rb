@@ -8,6 +8,8 @@ class CodeWriter
   TEMP = 'temp'.freeze
   POINTER = 'pointer'.freeze
 
+  attr_accessor :input_file_name
+
   def initialize(out_file)
     @file = File.open(out_file, 'w')
   end
@@ -63,6 +65,9 @@ class CodeWriter
                  "D=M"
       push_d_register
     when STATIC
+      write_code "@#{input_file_name}.#{index}",
+                 "D=M"
+      push_d_register
     else
       raise 'unknown'
     end
@@ -91,6 +96,11 @@ class CodeWriter
                  "@#{register}",
                  "M=D"
     when STATIC
+      pop_to_m_register
+
+      write_code "D=M",
+                 "@#{input_file_name}.#{index}",
+                 "M=D"
     else
       raise 'unknown'
     end
