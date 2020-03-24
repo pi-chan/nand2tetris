@@ -6,6 +6,7 @@ class CodeWriter
   THAT = 'that'.freeze
   ARGUMENT = 'argument'.freeze
   TEMP = 'temp'.freeze
+  POINTER = 'pointer'.freeze
 
   def initialize(out_file)
     @file = File.open(out_file, 'w')
@@ -33,9 +34,6 @@ class CodeWriter
   end
 
   def close
-    # write_code "(__END__)",
-    #            "@__END__",
-    #            "0;JMP"
     @file.close
   end
 
@@ -52,6 +50,18 @@ class CodeWriter
       write_code "@#{5+index}",
                  "D=M"
       push_d_register
+    when POINTER
+      register = case index
+                 when 0
+                   'THIS'
+                 when 1
+                   'THAT'
+                 else
+                   raise 'unknown'
+                 end
+      write_code "@#{register}",
+                 "D=M"
+      push_d_register
     when STATIC
     else
       raise 'unknown'
@@ -66,6 +76,19 @@ class CodeWriter
       pop_to_m_register
       write_code "D=M",
                  "@#{5+index}",
+                 "M=D"
+    when POINTER
+      pop_to_m_register
+      register = case index
+                 when 0
+                   'THIS'
+                 when 1
+                   'THAT'
+                 else
+                   raise 'unknown'
+                 end
+      write_code "D=M",
+                 "@#{register}",
                  "M=D"
     when STATIC
     else
