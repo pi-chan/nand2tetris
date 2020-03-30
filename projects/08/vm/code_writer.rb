@@ -35,6 +35,22 @@ class CodeWriter
     end
   end
 
+  def write_label(label_name)
+    write_code "(#{label_name})"
+  end
+
+  def write_goto(label)
+    write_code "@#{label}",
+               "0;JMP"
+  end
+
+  def write_if_goto(label)
+    pop_to_m_register
+    write_code  "D=M",
+                "@#{label}",
+                "D;JNE"
+  end
+
   def close
     @file.close
   end

@@ -19,6 +19,12 @@ loop do
     code_writer.write_arithmetic(parser.arg1)
   when :C_PUSH, :C_POP
     code_writer.write_push_pop(parser.command_type, parser.arg1, parser.arg2)
+  when :C_LABEL
+    code_writer.write_label(parser.arg1)
+  when :C_GOTO # goto
+    code_writer.write_goto(parser.arg1)
+  when :C_IF # if-goto
+    code_writer.write_if_goto(parser.arg1)
   when nil
   else
     puts 'not supported'
