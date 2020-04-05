@@ -51,6 +51,64 @@ class CodeWriter
                 "D;JNE"
   end
 
+  def write_function(name, arg_count)
+    write_code "(#{name})",
+               "D=0"
+
+    arg_count.times do
+      push_d_register
+    end
+  end
+
+  def write_return
+    write_code "@LCL",
+               "D=M",
+               "@R13",
+               "M=D",
+               "@5",
+               "D=A",
+               "@R13",
+               "A=M-D", # LCL - 5
+               "D=M",
+               "@R14",
+               "M=D"
+
+    pop_to_m_register
+    write_code "D=M",
+               "@ARG",
+               "A=M",
+               "M=D"
+
+    write_code "@ARG",
+               "D=M+1",
+               "@SP",
+               "M=D"
+
+    write_code "@R13",
+               "AM=M-1",
+               "D=M",
+               "@THAT",
+               "M=D",
+               "@R13",
+               "AM=M-1",
+               "D=M",
+               "@THIS",
+               "M=D",
+               "@R13",
+               "AM=M-1",
+               "D=M",
+               "@ARG",
+               "M=D",
+               "@R13",
+               "AM=M-1",
+               "D=M",
+               "@LCL",
+               "M=D",
+               '@R14',
+               'A=M',
+               '0;JMP'
+  end
+
   def close
     @file.close
   end

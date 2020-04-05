@@ -25,6 +25,10 @@ loop do
     code_writer.write_goto(parser.arg1)
   when :C_IF # if-goto
     code_writer.write_if_goto(parser.arg1)
+  when :C_FUNCTION
+    code_writer.write_function(parser.arg1, parser.arg2)
+  when :C_RETURN
+    code_writer.write_return
   when nil
   else
     puts 'not supported'
