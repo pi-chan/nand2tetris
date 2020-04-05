@@ -8,10 +8,19 @@ class CodeWriter
   TEMP = 'temp'.freeze
   POINTER = 'pointer'.freeze
 
-  attr_accessor :input_file_name
+  attr_accessor :input_file_name, :current_function_name
 
   def initialize(out_file)
     @file = File.open(out_file, 'w')
+    write_init_code
+  end
+
+  def write_init_code
+    write_code "@256",
+               "D=A",
+               "@SP",
+               "M=D"
+    write_call("Sys.init", 0)
   end
 
   def write_arithmetic(command)
@@ -35,19 +44,27 @@ class CodeWriter
     end
   end
 
+  def label_name_with_function(label_name)
+    "#{current_function_name}$#{label_name}"
+  end
+
   def write_label(label_name)
-    write_code "(#{label_name})"
+    if current_function_name
+      write_code "(#{label_name_with_function(label_name)})"
+    else
+      write_code "(#{label_name})"
+    end
   end
 
   def write_goto(label)
-    write_code "@#{label}",
+    write_code "@#{label_name_with_function(label)}",
                "0;JMP"
   end
 
   def write_if_goto(label)
     pop_to_m_register
     write_code  "D=M",
-                "@#{label}",
+                "@#{label_name_with_function(label)}",
                 "D;JNE"
   end
 
@@ -58,6 +75,8 @@ class CodeWriter
     arg_count.times do
       push_d_register
     end
+
+    self.current_function_name = name
   end
 
   def write_return
@@ -107,6 +126,41 @@ class CodeWriter
                '@R14',
                'A=M',
                '0;JMP'
+  end
+
+  def write_call(name, arg_count)
+    return_label = new_return_label
+    write_code "@#{new_return_label}", "D=A"
+    push_d_register
+
+    write_code "@LCL", "D=M"
+    push_d_register
+
+    write_code "@ARG", "D=M"
+    push_d_register
+
+    write_code "@THIS", "D=M"
+    push_d_register
+
+    write_code "@THAT", "D=M"
+    push_d_register
+
+    write_code "@SP",
+               "D=M",
+               "@5",
+               "D=D-A",
+               "@#{arg_count}",
+               "D=D-A",
+               "@ARG",
+               "M=D",
+               "@SP",
+               "D=M",
+               "@LCL",
+               "M=D"
+
+    write_code "@#{name}",
+               "0;JMP",
+               "(#{return_label})"
   end
 
   def close
@@ -306,6 +360,13 @@ class CodeWriter
     @label_index ||= 0
     label = "LABEL_#{@label_index}"
     @label_index += 1
+    label
+  end
+
+  def new_return_label
+    @return_label_index ||= 0
+    label = "_RETURN_LABEL_#{@return_label_index}"
+    @return_label_index += 1
     label
   end
 end

@@ -28,9 +28,15 @@ class Parser
   end
 
   def out_file
-    dir = File.dirname(@current_file)
-    file = File.basename(@current_file, '.vm')
-    File.join(dir, "#{file}.asm")
+    case File.ftype(@in_file_or_dir)
+    when 'file'
+      dir = File.dirname(@current_file)
+      file = File.basename(@current_file, '.vm')
+      File.join(dir, "#{file}.asm")
+    when 'directory'
+      name = File.basename(@in_file_or_dir)
+      File.join(@in_file_or_dir, "#{name}.asm")
+    end
   end
 
   def current_file_name

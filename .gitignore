@@ -1,3 +1,4 @@
 *.out
 projects/06/**/*.hack
 projects/07/**/*.asm
+projects/08/**/*.asm
