@@ -130,7 +130,9 @@ class CodeWriter
 
   def write_call(name, arg_count)
     return_label = new_return_label
-    write_code "@#{new_return_label}", "D=A"
+    write_code "// return-label",
+               "@#{return_label}",
+               "D=A"
     push_d_register
 
     write_code "@LCL", "D=M"
@@ -167,6 +169,10 @@ class CodeWriter
     @file.close
   end
 
+  def write_code(*code_lines)
+    @file.puts code_lines
+  end
+
   private
 
   def write_push(segment, index)
@@ -177,20 +183,18 @@ class CodeWriter
     when LOCAL, THIS, THAT, ARGUMENT
       push_d_register_from_segment(segment, index)
     when TEMP
-      write_code "@#{5+index}",
-                 "D=M"
+      write_code "@5"
+      index.times do
+        self.write_code('A=A+1')
+      end
+      write_code "D=M"
       push_d_register
     when POINTER
-      register = case index
-                 when 0
-                   'THIS'
-                 when 1
-                   'THAT'
-                 else
-                   raise 'unknown'
-                 end
-      write_code "@#{register}",
-                 "D=M"
+      write_code "@3"
+      index.times do
+        self.write_code('A=A+1')
+      end
+      write_code "D=M"
       push_d_register
     when STATIC
       write_code "@#{input_file_name}.#{index}",
@@ -208,21 +212,19 @@ class CodeWriter
     when TEMP
       pop_to_m_register
       write_code "D=M",
-                 "@#{5+index}",
-                 "M=D"
+                 "@5"
+      index.times do
+        self.write_code('A=A+1')
+      end
+      write_code "M=D"
     when POINTER
       pop_to_m_register
-      register = case index
-                 when 0
-                   'THIS'
-                 when 1
-                   'THAT'
-                 else
-                   raise 'unknown'
-                 end
       write_code "D=M",
-                 "@#{register}",
-                 "M=D"
+                 "@3"
+      index.times do
+        self.write_code('A=A+1')
+      end
+      write_code "M=D"
     when STATIC
       pop_to_m_register
 
@@ -284,10 +286,6 @@ class CodeWriter
     write_code "@SP",
                "M=M-1",
                "A=M"
-  end
-
-  def write_code(*code_lines)
-    @file.puts code_lines
   end
 
   def binary_operation(command)

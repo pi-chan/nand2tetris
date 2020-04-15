@@ -50,7 +50,7 @@ class Parser
 
     return if @current_file.nil?
 
-    @current_line = @current_file.gets.strip.strip.gsub(%r{//.+}, '').strip
+    @current_line = @current_file.gets.gsub(%r{//.+}, '').strip
   end
 
   def has_more_commands?
@@ -69,7 +69,12 @@ class Parser
 
   def arg2
     tokens = @current_line.split(/\s/)
-    tokens[2].to_i
+    case command_type
+    when :C_PUSH, :C_POP, :C_FUNCTION, :C_CALL
+      tokens[2].to_i
+    else
+      raise 'invalid call'
+    end
   end
 
   def command_type

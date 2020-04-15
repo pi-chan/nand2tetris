@@ -11,8 +11,7 @@ loop do
   parser.advance
 
   code_writer.input_file_name = parser.current_file_name
-
-  puts parser.current_line
+  code_writer.write_code "// #{parser.current_line}" unless parser.command_type.nil?
 
   case parser.command_type
   when :C_ARITHMETIC
